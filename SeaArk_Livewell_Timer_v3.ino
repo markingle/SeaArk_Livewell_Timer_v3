@@ -41,8 +41,8 @@ uint32_t onState = 1;
 int POWER = 13; //13
 int TIMER_SWITCH = 2; 
 int WIFI_CONNECTION = 15; //15
-int WIFI_CLIENT_CONNECTED = 17; //16
-int Timer_LED = 16;  //17
+int WIFI_CLIENT_CONNECTED = 16; //16
+int Timer_LED = 17;  //17
 int SPEED = 14; 
 int LEFT = 12; 
 int RIGHT = 13;
@@ -220,7 +220,10 @@ void setup() {
   Serial.println("Start up state of pump is OFF");
   timer_state = false;
   pumpOn = false;
-
+  pinMode(TIMER_SWITCH, OUTPUT);
+  digitalWrite(TIMER_SWITCH, LOW);
+  digitalWrite(Timer_LED, LOW);
+  
   EEPROM.begin(3); //Index of three for - On/Off state 1 or 0, OnTime value, OffTime value
 
   //Determine the value set for ON Time in EEPROM
@@ -322,7 +325,7 @@ void IRAM_ATTR onoffTimer(){
         Serial.println("Turning OFF pump");
         digitalWrite(Timer_LED, LOW);
       }
-      //Serial.println("Pump has been OFF for " + String(Clock_seconds) + " seconds");
+      Serial.println("Pump has been OFF for " + String(Clock_seconds) + " seconds");
       
       pCharacteristicD->setValue((uint8_t*)&Clock_seconds, 4);
       pCharacteristicD->notify();
@@ -340,7 +343,7 @@ void IRAM_ATTR onoffTimer(){
         Serial.println("Turning ON pump");
         digitalWrite(Timer_LED, HIGH);
       }
-      //Serial.println("Pump is running for " + String(Clock_seconds) + " seconds");
+      Serial.println("Pump is running for " + String(Clock_seconds) + " seconds");
     
       pCharacteristicD->setValue((uint8_t*)&Clock_seconds, 4);
       pCharacteristicD->notify();
@@ -384,6 +387,7 @@ void loop() {
         //pCharacteristicD->setValue((uint8_t*)&value, 4);
         //pCharacteristicD->notify();
         value++;
+        digitalWrite(WIFI_CLIENT_CONNECTED, LOW);
         delay(1000); // bluetooth stack will go into congestion, if too many packets are sent, in 6 hours test i was able to go as low as 3ms
         //pCharacteristicB->setValue((uint8_t*)&onState, 4);
         //pCharacteristicB->notify(); 
